@@ -9,4 +9,4 @@ binding = "AI"
 [[d1_databases]]
 binding = "DB"
 database_name = "cloud-flared-cache"
-database_id = "<fill-after-d1-create>"
+database_id = "b26f9d68-d091-4b50-b424-4db156e20f10"
