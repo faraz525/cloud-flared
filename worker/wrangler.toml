@@ -1,0 +1,12 @@
+name = "cloud-flared"
+main = "src/index.ts"
+compatibility_date = "2026-03-01"
+compatibility_flags = ["nodejs_compat"]
+
+[ai]
+binding = "AI"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "cloud-flared-cache"
+database_id = "<fill-after-d1-create>"
