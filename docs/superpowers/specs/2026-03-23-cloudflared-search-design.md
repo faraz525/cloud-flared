@@ -321,3 +321,27 @@ Run with `wrangler dev` (local Worker with real Cloudflare service access).
 | SearXNG | Self-hosted on Pi | Unlimited | $0 |
 
 **Estimated total: $0-5/month** on Workers Paid plan ($5/mo base). Free tier sufficient for personal/demo usage.
+
+## V2 Ideas
+
+### Dynamic Workers for Per-Site Extraction
+
+**Problem:** The current `extract.ts` sends a generic LLM prompt for every page ("extract title and content from this markdown"). This burns neurons on every extraction and treats a recipe blog the same as a news article.
+
+**Idea:** Use [Dynamic Workers](https://blog.cloudflare.com/dynamic-workers/) (launched March 2026) to generate and cache custom extraction functions per domain.
+
+**How it would work:**
+1. First time we see a domain (e.g., `nytimes.com`), ask Workers AI to **generate a JS extraction function** tailored to that site's markdown structure
+2. Load the generated function into a Dynamic Worker sandbox (`env.LOADER.load(...)`) with `globalOutbound: null` (no internet access — safety first)
+3. Run the sandboxed function against the page content — pure JS execution, no LLM call
+4. Cache the extractor code in D1 keyed by domain — reuse it for every future page from that domain
+
+**Why it's better:**
+- **Cheaper** — one LLM call to generate the extractor, then pure JS for each page (vs. one LLM call per page today)
+- **Faster** — JS execution in a V8 isolate is near-instant vs. waiting for LLM inference
+- **Smarter** — domain-specific extractors can handle site-specific quirks (recipe cards, article schemas, etc.)
+- **Safe** — Dynamic Workers run in isolated V8 sandboxes with explicit permission boundaries, no network access
+
+**Cost:** Dynamic Workers are free during beta, then $0.002 per unique Worker loaded daily. Negligible for personal use.
+
+**Complexity:** Medium. Requires prompt engineering for reliable code generation, error handling when generated code fails (fall back to current generic extraction), and a cache eviction strategy for stale extractors.
