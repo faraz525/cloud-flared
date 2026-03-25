@@ -17,7 +17,7 @@ const server = new McpServer({
 })
 
 server.tool(
-  "web_search",
+  "cloud_search",
   "Search the web using SearXNG and Cloudflare-powered crawling and AI summarization. Returns a synthesized answer with sources.",
   {
     query: z.string().describe("The search query"),
